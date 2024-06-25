@@ -9,7 +9,7 @@ void i2c_initialize(void);
 struct i2c_tx_handle {
     uint32_t bytes_left;
     uint8_t bytes_left_in_batch; // A batch has at most 255 bytes.
-    bool autoend;
+    bool with_reload;
 };
 
 /**

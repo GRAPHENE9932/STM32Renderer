@@ -49,7 +49,7 @@ struct i2c_tx_handle i2c_begin_master_transmission(uint8_t address, uint32_t siz
     struct i2c_tx_handle handle = {
         .bytes_left = size,
         .bytes_left_in_batch = size <= 255 ? size : 255,
-        .autoend = size <= 255
+        .with_reload = size <= 255
     };
 
     return handle;
@@ -57,7 +57,7 @@ struct i2c_tx_handle i2c_begin_master_transmission(uint8_t address, uint32_t siz
 
 void i2c_send_next_byte(struct i2c_tx_handle* handle, uint8_t byte) {
     if (handle->bytes_left_in_batch == 0) {
-        while (!handle->autoend && !LL_I2C_IsActiveFlag_TCR(I2C1));
+        while (!handle->with_reload && !LL_I2C_IsActiveFlag_TCR(I2C1));
 
         handle->bytes_left_in_batch = handle->bytes_left <= 255 ? handle->bytes_left : 255;
         LL_I2C_SetTransferSize(I2C1, handle->bytes_left_in_batch);
