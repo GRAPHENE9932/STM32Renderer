@@ -42,6 +42,7 @@ add_executable(
 
     src/startup.s
     src/main.c
+    src/i2c.c
 )
 
 add_definitions(-DUSE_FULL_LL_DRIVER)
