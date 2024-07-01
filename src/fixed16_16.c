@@ -46,13 +46,15 @@ static uint32_t div_48_bit_int_by_32_bit_int(uint64_t a, uint64_t b) {
     uint32_t result = 0;
     uint32_t cur_power = trailing_zeroes(b) + 16;
 
-    while (cur_power != 0) {
+    while (true) {
         if ((b << cur_power) <= a) {
             result |= 1 << cur_power;
             a -= b << cur_power;
         }
 
-        cur_power--;
+        if (cur_power-- == 0) {
+            break;
+        }
     }
 
     return result;
