@@ -16,8 +16,13 @@ void i2c_initialize(void) {
     i2c1_sda.Alternate = LL_GPIO_AF_4;
     LL_GPIO_Init(GPIOA, &i2c1_sda);
 
-    LL_GPIO_InitTypeDef i2c1_scl = i2c1_sda;
+    LL_GPIO_InitTypeDef i2c1_scl;
     i2c1_scl.Pin = LL_GPIO_PIN_9;
+    i2c1_scl.Mode = LL_GPIO_MODE_ALTERNATE;
+    i2c1_scl.Speed = LL_GPIO_SPEED_FREQ_HIGH;
+    i2c1_scl.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
+    i2c1_scl.Pull = LL_GPIO_PULL_UP;
+    i2c1_scl.Alternate = LL_GPIO_AF_4;
     LL_GPIO_Init(GPIOA, &i2c1_scl);
 
     LL_I2C_InitTypeDef i2c1_init;
