@@ -15,4 +15,4 @@ target_include_directories(
     ../submodules/Unity/src
 )
 
-set_target_properties(stm32renderer_test PROPERTIES OUTPUT_NAME stm32renderer_test.elf)
+set_target_properties(stm32renderer_test PROPERTIES OUTPUT_NAME stm32renderer_test)

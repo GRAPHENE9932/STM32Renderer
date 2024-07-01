@@ -81,5 +81,5 @@ ExternalProject_Add(
         -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
 )
 
-add_test(NAME stm32renderer_test COMMAND ./test/stm32renderer_test.elf)
+add_test(NAME stm32renderer_test COMMAND ./test/stm32renderer_test)
 enable_testing()
