@@ -1,0 +1,50 @@
+#include "math/quat.h"
+
+struct quat quat_mul(const struct quat* a, const struct quat* b) {
+    struct quat result;
+    result.w = fixed16_16_mul(a->w, b->w) - fixed16_16_mul(a->x, b->x) - fixed16_16_mul(a->y, b->y) - fixed16_16_mul(a->z, b->z);
+    result.x = fixed16_16_mul(a->w, b->x) + fixed16_16_mul(a->x, b->w) + fixed16_16_mul(a->y, b->z) - fixed16_16_mul(a->z, b->y);
+    result.y = fixed16_16_mul(a->w, b->y) + fixed16_16_mul(a->y, b->w) + fixed16_16_mul(a->z, b->x) - fixed16_16_mul(a->x, b->z);
+    result.z = fixed16_16_mul(a->w, b->z) + fixed16_16_mul(a->z, b->w) + fixed16_16_mul(a->x, b->y) - fixed16_16_mul(a->y, b->x);
+
+    return result;
+}
+
+static void conjugate(struct quat* q) {
+    q->x = -q->x;
+    q->y = -q->y;
+    q->z = -q->z;
+}
+
+static struct quat pure_quat_from_vec3(const struct vec3* v) {
+    struct quat result;
+    result.w = 0;
+    result.x = v->x;
+    result.y = v->y;
+    result.z = v->z;
+
+    return result;
+}
+
+static struct vec3 vec3_from_pure_quat(const struct quat* q) {
+    struct vec3 result;
+    result.x = q->x;
+    result.y = q->y;
+    result.z = q->z;
+
+    return result;
+}
+
+struct vec3 quat_mul_by_vec3(const struct quat* q, const struct vec3* v) {
+    struct quat q_conjugate = *q;
+    conjugate(&q_conjugate);
+
+    struct quat quat_v;
+    quat_v = pure_quat_from_vec3(v);
+
+    struct quat result_quat;
+    result_quat = quat_mul(q, &quat_v);
+    result_quat = quat_mul(&result_quat, &q_conjugate);
+
+    return vec3_from_pure_quat(&result_quat);
+}
