@@ -27,6 +27,7 @@ add_executable(
     src/sh1106.c
     src/fixed16_16.c
     src/runtime_abi.c
+    src/math/vec3.c
 )
 
 target_compile_options(
