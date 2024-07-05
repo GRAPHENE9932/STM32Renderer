@@ -101,19 +101,18 @@ typedef int32_t fixed16_16;
     FIXED16_16_INTERNAL_POSITIVE_CONST(integer, fraction, zeroes_preceding_fraction)\
 ))
 
-static inline fixed16_16 fixed16_16_add(fixed16_16 a, fixed16_16 b) {
-    return a + b;
-}
+#define FIXED16_16_ZERO ((fixed16_16)0x00000000)
+#define FIXED16_16_ONE ((fixed16_16)0x00010000)
+#define FIXED16_16_MINUS_ONE ((fixed16_16)0xFFFEFFFF)
 
-static inline fixed16_16 fixed16_16_sub(fixed16_16 a, fixed16_16 b) {
-    return a - b;
-}
-
-uint32_t uint32_div(uint32_t a, uint32_t b);
 fixed16_16 fixed16_16_mul(fixed16_16 a, fixed16_16 b);
 fixed16_16 fixed16_16_div(fixed16_16 a, fixed16_16 b);
 
 fixed16_16 fixed16_16_sin(fixed16_16 rad);
 fixed16_16 fixed16_16_cos(fixed16_16 rad);
+
+static inline fixed16_16 fixed16_16_from_uint32(uint32_t num) {
+    return num << 16;
+}
 
 #endif // FIXED16_16
