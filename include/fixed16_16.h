@@ -104,6 +104,8 @@ typedef int32_t fixed16_16;
 #define FIXED16_16_ZERO ((fixed16_16)0x00000000)
 #define FIXED16_16_ONE ((fixed16_16)0x00010000)
 #define FIXED16_16_MINUS_ONE ((fixed16_16)0xFFFEFFFF)
+#define FIXED16_16_MAX ((fixed16_16)0x7FFFFFFF)
+#define FIXED16_16_MIN ((fixed16_16)0x80000000)
 
 fixed16_16 fixed16_16_mul(fixed16_16 a, fixed16_16 b);
 fixed16_16 fixed16_16_div(fixed16_16 a, fixed16_16 b);
