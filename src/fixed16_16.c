@@ -78,3 +78,81 @@ fixed16_16 fixed16_16_div(fixed16_16 a, fixed16_16 b) {
 
     return div_48_bit_int_by_32_bit_int(shifted_a, b);
 }
+
+static const fixed16_16 INV_SQRT_TABLE[] = {
+    0x7FFFFFFF, // 1 / sqrt(0)
+    0x01000000, // 1 / sqrt(1/65536)
+    0x00B504F3, // 1 / sqrt(2/65536)
+    0x00800000, // 1 / sqrt(4/65536)
+    0x005A8279, // 1 / sqrt(8/65536)
+    0x00400000, // And so on
+    0x002D413C,
+    0x00200000,
+    0x0016A09E,
+    0x00100000,
+    0x000B504F,
+    0x00080000,
+    0x0005A827,
+    0x00040000,
+    0x0002D413,
+    0x00020000,
+    0x00016A09,
+    0x00010000,
+    0x0000B504,
+    0x00008000,
+    0x00005A82,
+    0x00004000,
+    0x00002D41,
+    0x00002000,
+    0x000016A0,
+    0x00001000,
+    0x00000B50,
+    0x00000800,
+    0x000005A8,
+    0x00000400,
+    0x000002D4,
+    0x00000200,
+    0x0000016A // 1 / sqrt(32768)
+};
+
+static fixed16_16 fixed16_16_estimate_inv_sqrt(fixed16_16 num) {
+    // Special case, that can break the further logic.
+    if (num == 0) {
+        return 0;
+    }
+
+    uint32_t i_begin = 32 - trailing_zeroes(num);
+    uint32_t i_end = i_begin + 1;
+
+    return INV_SQRT_TABLE[i_begin] + fixed16_16_mul((num - (1 << (i_begin - 1))) >> (i_begin - 1), INV_SQRT_TABLE[i_end]);
+}
+
+fixed16_16 fixed16_16_sqrt(fixed16_16 num) {
+    fixed16_16 y = fixed16_16_estimate_inv_sqrt(num);
+
+    fixed16_16 b = num;
+    fixed16_16 res = fixed16_16_mul(num, y);
+
+    for (uint32_t i = 0; i < 4; i++) { // 4 iterations are tested to be enough for 2% of relative precision.
+        b = fixed16_16_mul(fixed16_16_mul(b, y), y);
+        y = (FIXED16_16_CONST(3, 0, 0) - b) >> 1;
+        res = fixed16_16_mul(res, y);
+    }
+
+    return res;
+}
+
+fixed16_16 fixed16_16_inv_sqrt(fixed16_16 num) {
+    fixed16_16 y = fixed16_16_estimate_inv_sqrt(num);
+
+    fixed16_16 b = num;
+    fixed16_16 res = y;
+
+    for (uint32_t i = 0; i < 4; i++) { // 4 iterations are tested to be enough for 2% of relative precision.
+        b = fixed16_16_mul(fixed16_16_mul(b, y), y);
+        y = (FIXED16_16_CONST(3, 0, 0) - b) >> 1;
+        res = fixed16_16_mul(res, y);
+    }
+
+    return res;
+}

@@ -110,6 +110,9 @@ typedef int32_t fixed16_16;
 fixed16_16 fixed16_16_mul(fixed16_16 a, fixed16_16 b);
 fixed16_16 fixed16_16_div(fixed16_16 a, fixed16_16 b);
 
+fixed16_16 fixed16_16_sqrt(fixed16_16 num);
+fixed16_16 fixed16_16_inv_sqrt(fixed16_16 num);
+
 fixed16_16 fixed16_16_sin(fixed16_16 rad);
 fixed16_16 fixed16_16_cos(fixed16_16 rad);
 

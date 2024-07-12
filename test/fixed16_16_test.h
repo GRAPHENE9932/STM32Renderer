@@ -4,6 +4,8 @@
 void test_fixed16_16_fixed16_16_const(void);
 void test_fixed16_16_mul(void);
 void test_fixed16_16_div(void);
+void test_fixed16_16_sqrt(void);
+void test_fixed16_16_inv_sqrt(void);
 void test_fixed16_16_sin(void);
 void test_fixed16_16_cos(void);
 

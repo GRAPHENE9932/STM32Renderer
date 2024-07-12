@@ -15,6 +15,8 @@ int main(void) {
     RUN_TEST(test_fixed16_16_fixed16_16_const);
     RUN_TEST(test_fixed16_16_mul);
     RUN_TEST(test_fixed16_16_div);
+    RUN_TEST(test_fixed16_16_sqrt);
+    RUN_TEST(test_fixed16_16_inv_sqrt);
     RUN_TEST(test_fixed16_16_sin);
     RUN_TEST(test_fixed16_16_cos);
     return UNITY_END();

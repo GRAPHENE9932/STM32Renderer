@@ -15,6 +15,9 @@ target_include_directories(
     ../submodules/Unity/src
 )
 
+target_link_libraries(stm32renderer_test m)
+target_compile_definitions(stm32renderer_test PUBLIC UNITY_INCLUDE_DOUBLE)
+
 set_target_properties(stm32renderer_test PROPERTIES OUTPUT_NAME stm32renderer_test)
 
 # The stm32renderer and stm32renderer_test are two independent CMake projects built for different CPU architectures
