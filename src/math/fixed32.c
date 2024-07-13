@@ -1,4 +1,4 @@
-#include "fixed32.h"
+#include "math/fixed32.h"
 
 #include <stdbool.h>
 

@@ -1,5 +1,5 @@
 #include "fixed32_test.h"
-#include "fixed32.h"
+#include "math/fixed32.h"
 
 #include <unity.h>
 
