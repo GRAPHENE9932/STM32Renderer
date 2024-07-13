@@ -120,4 +120,12 @@ static inline fixed16_16 fixed16_16_from_uint32(uint32_t num) {
     return num << 16;
 }
 
+static inline fixed16_16 fixed16_16_from_int32(int32_t num) {
+    return num << 16;
+}
+
+static inline fixed16_16 fixed16_16_abs(fixed16_16 num) {
+    return num < FIXED16_16_ZERO ? -num : num;
+}
+
 #endif // FIXED16_16
