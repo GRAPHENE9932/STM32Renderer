@@ -26,6 +26,7 @@ add_executable(
     src/i2c.c
     src/sh1106.c
     src/fixed16_16.c
+    src/fixed32.c
     src/runtime_abi.c
     src/math/quat.c
     src/math/vec3.c

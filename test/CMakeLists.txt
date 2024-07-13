@@ -4,8 +4,8 @@ project("stm32renderer_test" C ASM)
 
 add_executable(stm32renderer_test
     main.c
-    fixed16_16_test.c
-    ../src/fixed16_16.c
+    fixed32_test.c
+    ../src/fixed32.c
     ../submodules/Unity/src/unity.c
 )
 

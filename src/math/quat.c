@@ -2,10 +2,10 @@
 
 struct quat quat_mul(const struct quat* a, const struct quat* b) {
     struct quat result;
-    result.w = fixed16_16_mul(a->w, b->w) - fixed16_16_mul(a->x, b->x) - fixed16_16_mul(a->y, b->y) - fixed16_16_mul(a->z, b->z);
-    result.x = fixed16_16_mul(a->w, b->x) + fixed16_16_mul(a->x, b->w) + fixed16_16_mul(a->y, b->z) - fixed16_16_mul(a->z, b->y);
-    result.y = fixed16_16_mul(a->w, b->y) + fixed16_16_mul(a->y, b->w) + fixed16_16_mul(a->z, b->x) - fixed16_16_mul(a->x, b->z);
-    result.z = fixed16_16_mul(a->w, b->z) + fixed16_16_mul(a->z, b->w) + fixed16_16_mul(a->x, b->y) - fixed16_16_mul(a->y, b->x);
+    result.w = fixed32_mul(a->w, b->w) - fixed32_mul(a->x, b->x) - fixed32_mul(a->y, b->y) - fixed32_mul(a->z, b->z);
+    result.x = fixed32_mul(a->w, b->x) + fixed32_mul(a->x, b->w) + fixed32_mul(a->y, b->z) - fixed32_mul(a->z, b->y);
+    result.y = fixed32_mul(a->w, b->y) + fixed32_mul(a->y, b->w) + fixed32_mul(a->z, b->x) - fixed32_mul(a->x, b->z);
+    result.z = fixed32_mul(a->w, b->z) + fixed32_mul(a->z, b->w) + fixed32_mul(a->x, b->y) - fixed32_mul(a->y, b->x);
 
     return result;
 }

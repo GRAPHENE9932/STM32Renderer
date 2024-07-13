@@ -1,12 +1,12 @@
-#ifndef FIXED16_16
-#define FIXED16_16
+#ifndef FIXED32
+#define FIXED32
 
 #include <stdint.h>
 
 // 16.16 signed fixed-point number.
-typedef int32_t fixed16_16;
+typedef int32_t fixed32;
 
-#define FIXED16_16_INTERNAL_LOG10(x) (\
+#define FIXED32_INTERNAL_LOG10(x) (\
     ((uint64_t)(x)) == 0U ? 0 :\
     ((uint64_t)(x)) < 10U ? 1 :\
     ((uint64_t)(x)) < 100U ? 2 :\
@@ -29,7 +29,7 @@ typedef int32_t fixed16_16;
     ((uint64_t)(x)) < 10000000000000000000U ? 19 : -1\
 )
 
-#define FIXED16_16_INTERNAL_POW(x, p) (\
+#define FIXED32_INTERNAL_POW(x, p) (\
     ((p) == 0) ? 1 :\
     ((p) == 1) ? ((uint64_t)(x)) :\
     ((p) == 2) ? ((uint64_t)(x)) * ((uint64_t)(x)) :\
@@ -73,59 +73,59 @@ typedef int32_t fixed16_16;
     ((uint64_t)(x)) * ((uint64_t)(x)) * ((uint64_t)(x)) * ((uint64_t)(x)) : 0xFFFFFFFFFFFFFFFF\
 )
 
-#define FIXED16_16_INTERNAL_POSITIVE_CONST(integer, fraction, zeroes_preceding_fraction) (\
+#define FIXED32_INTERNAL_POSITIVE_CONST(integer, fraction, zeroes_preceding_fraction) (\
     (((uint32_t)(integer)) << 16) |\
-    ((((uint64_t)(fraction)) << (16U - (FIXED16_16_INTERNAL_LOG10(fraction) + zeroes_preceding_fraction))) / \
-    FIXED16_16_INTERNAL_POW(5, (FIXED16_16_INTERNAL_LOG10(fraction) + zeroes_preceding_fraction)))\
+    ((((uint64_t)(fraction)) << (16U - (FIXED32_INTERNAL_LOG10(fraction) + zeroes_preceding_fraction))) / \
+    FIXED32_INTERNAL_POW(5, (FIXED32_INTERNAL_LOG10(fraction) + zeroes_preceding_fraction)))\
 )
 
 /**
- * @brief Create a fixed16_16 constant from the human-readable (almost) representation.
+ * @brief Create a fixed32 constant from the human-readable (almost) representation.
  *
  * If the integer OR fraction part is negative, the constant will be negative.
- * If the described number cannot be represented with fixed16_16 exactly, the result will be rounded down.
+ * If the described number cannot be represented with fixed32 exactly, the result will be rounded down.
  * Examples:
- * - FIXED16_16_CONST(31, 125, 0) // 31.125
- * - FIXED16_16_CONST(-31, 125, 0) // -31.125
- * - FIXED16_16_CONST(0, 1373291015625, 3) // 0.0001373291015625
- * - FIXED16_16_CONST(0, -261688232421875, 1) // -0.0261688232421875
- * - FIXED16_16_CONST(0, 9999000000000000, 0) // 0.9998931884765625
+ * - FIXED32_CONST(31, 125, 0) // 31.125
+ * - FIXED32_CONST(-31, 125, 0) // -31.125
+ * - FIXED32_CONST(0, 1373291015625, 3) // 0.0001373291015625
+ * - FIXED32_CONST(0, -261688232421875, 1) // -0.0261688232421875
+ * - FIXED32_CONST(0, 9999000000000000, 0) // 0.9998931884765625
  * 
  * @param integer The integer part of the number.
  * @param fraction The fraction part of the number (without the preceding zeroes).
  * @param zeroes_preceding_fraction The number of zeroes preceding the fraction part.
  */
-#define FIXED16_16_CONST(integer, fraction, zeroes_preceding_fraction) ((fixed16_16)(\
-    ((integer) < 0) ? -FIXED16_16_INTERNAL_POSITIVE_CONST(-(integer), fraction, zeroes_preceding_fraction) :\
-    ((fraction) < 0) ? -FIXED16_16_INTERNAL_POSITIVE_CONST(integer, -(fraction), zeroes_preceding_fraction) :\
-    FIXED16_16_INTERNAL_POSITIVE_CONST(integer, fraction, zeroes_preceding_fraction)\
+#define FIXED32_CONST(integer, fraction, zeroes_preceding_fraction) ((fixed32)(\
+    ((integer) < 0) ? -FIXED32_INTERNAL_POSITIVE_CONST(-(integer), fraction, zeroes_preceding_fraction) :\
+    ((fraction) < 0) ? -FIXED32_INTERNAL_POSITIVE_CONST(integer, -(fraction), zeroes_preceding_fraction) :\
+    FIXED32_INTERNAL_POSITIVE_CONST(integer, fraction, zeroes_preceding_fraction)\
 ))
 
-#define FIXED16_16_ZERO ((fixed16_16)0x00000000)
-#define FIXED16_16_ONE ((fixed16_16)0x00010000)
-#define FIXED16_16_MINUS_ONE ((fixed16_16)0xFFFEFFFF)
-#define FIXED16_16_MAX ((fixed16_16)0x7FFFFFFF)
-#define FIXED16_16_MIN ((fixed16_16)0x80000000)
+#define FIXED32_ZERO ((fixed32)0x00000000)
+#define FIXED32_ONE ((fixed32)0x00010000)
+#define FIXED32_MINUS_ONE ((fixed32)0xFFFEFFFF)
+#define FIXED32_MAX ((fixed32)0x7FFFFFFF)
+#define FIXED32_MIN ((fixed32)0x80000000)
 
-fixed16_16 fixed16_16_mul(fixed16_16 a, fixed16_16 b);
-fixed16_16 fixed16_16_div(fixed16_16 a, fixed16_16 b);
+fixed32 fixed32_mul(fixed32 a, fixed32 b);
+fixed32 fixed32_div(fixed32 a, fixed32 b);
 
-fixed16_16 fixed16_16_sqrt(fixed16_16 num);
-fixed16_16 fixed16_16_inv_sqrt(fixed16_16 num);
+fixed32 fixed32_sqrt(fixed32 num);
+fixed32 fixed32_inv_sqrt(fixed32 num);
 
-fixed16_16 fixed16_16_sin(fixed16_16 rad);
-fixed16_16 fixed16_16_cos(fixed16_16 rad);
+fixed32 fixed32_sin(fixed32 rad);
+fixed32 fixed32_cos(fixed32 rad);
 
-static inline fixed16_16 fixed16_16_from_uint32(uint32_t num) {
+static inline fixed32 fixed32_from_uint32(uint32_t num) {
     return num << 16;
 }
 
-static inline fixed16_16 fixed16_16_from_int32(int32_t num) {
+static inline fixed32 fixed32_from_int32(int32_t num) {
     return num << 16;
 }
 
-static inline fixed16_16 fixed16_16_abs(fixed16_16 num) {
-    return num < FIXED16_16_ZERO ? -num : num;
+static inline fixed32 fixed32_abs(fixed32 num) {
+    return num < FIXED32_ZERO ? -num : num;
 }
 
-#endif // FIXED16_16
+#endif // FIXED32

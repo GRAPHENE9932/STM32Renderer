@@ -1,28 +1,28 @@
-#include "fixed16_16.h"
+#include "fixed32.h"
 
 #include <stdbool.h>
 
-static uint32_t fixed16_16_mul_unsigned(uint32_t a, uint32_t b) {
+static uint32_t fixed32_mul_unsigned(uint32_t a, uint32_t b) {
     return (((a >> 16) * (b >> 16)) << 16) +
         ((a >> 16) * (b & 0x0000FFFF)) +
         ((b >> 16) * (a & 0x0000FFFF)) +
         (((a & 0x0000FFFF) * (b & 0x0000FFFF)) >> 16);
 }
 
-fixed16_16 fixed16_16_mul(fixed16_16 a, fixed16_16 b) {
+fixed32 fixed32_mul(fixed32 a, fixed32 b) {
     if (a < 0 && b >= 0) {
-        return -fixed16_16_mul_unsigned(-a, b);
+        return -fixed32_mul_unsigned(-a, b);
     }
 
     if (a >= 0 && b < 0) {
-        return -fixed16_16_mul_unsigned(a, -b);
+        return -fixed32_mul_unsigned(a, -b);
     }
 
     if (a < 0 && b < 0) {
-        return fixed16_16_mul_unsigned(-a, -b);
+        return fixed32_mul_unsigned(-a, -b);
     }
 
-    return fixed16_16_mul_unsigned(a, b);
+    return fixed32_mul_unsigned(a, b);
 }
 
 static uint32_t trailing_zeroes(uint32_t x) {
@@ -60,7 +60,7 @@ static uint32_t div_48_bit_int_by_32_bit_int(uint64_t a, uint64_t b) {
     return result;
 }
 
-fixed16_16 fixed16_16_div(fixed16_16 a, fixed16_16 b) {
+fixed32 fixed32_div(fixed32 a, fixed32 b) {
     uint32_t mod_a = a < 0 ? -a : a;
     uint64_t shifted_a = ((uint64_t)mod_a) << 16;
 
@@ -79,7 +79,7 @@ fixed16_16 fixed16_16_div(fixed16_16 a, fixed16_16 b) {
     return div_48_bit_int_by_32_bit_int(shifted_a, b);
 }
 
-static const fixed16_16 INV_SQRT_TABLE[] = {
+static const fixed32 INV_SQRT_TABLE[] = {
     0x7FFFFFFF, // 1 / sqrt(0)
     0x01000000, // 1 / sqrt(1/65536)
     0x00B504F3, // 1 / sqrt(2/65536)
@@ -115,7 +115,7 @@ static const fixed16_16 INV_SQRT_TABLE[] = {
     0x0000016A // 1 / sqrt(32768)
 };
 
-static fixed16_16 fixed16_16_estimate_inv_sqrt(fixed16_16 num) {
+static fixed32 fixed32_estimate_inv_sqrt(fixed32 num) {
     // Special case, that can break the further logic.
     if (num == 0) {
         return 0;
@@ -124,34 +124,34 @@ static fixed16_16 fixed16_16_estimate_inv_sqrt(fixed16_16 num) {
     uint32_t i_begin = 32 - trailing_zeroes(num);
     uint32_t i_end = i_begin + 1;
 
-    return INV_SQRT_TABLE[i_begin] + fixed16_16_mul((num - (1 << (i_begin - 1))) >> (i_begin - 1), INV_SQRT_TABLE[i_end]);
+    return INV_SQRT_TABLE[i_begin] + fixed32_mul((num - (1 << (i_begin - 1))) >> (i_begin - 1), INV_SQRT_TABLE[i_end]);
 }
 
-fixed16_16 fixed16_16_sqrt(fixed16_16 num) {
-    fixed16_16 y = fixed16_16_estimate_inv_sqrt(num);
+fixed32 fixed32_sqrt(fixed32 num) {
+    fixed32 y = fixed32_estimate_inv_sqrt(num);
 
-    fixed16_16 b = num;
-    fixed16_16 res = fixed16_16_mul(num, y);
+    fixed32 b = num;
+    fixed32 res = fixed32_mul(num, y);
 
     for (uint32_t i = 0; i < 4; i++) { // 4 iterations are tested to be enough for 2% of relative precision.
-        b = fixed16_16_mul(fixed16_16_mul(b, y), y);
-        y = (FIXED16_16_CONST(3, 0, 0) - b) >> 1;
-        res = fixed16_16_mul(res, y);
+        b = fixed32_mul(fixed32_mul(b, y), y);
+        y = (FIXED32_CONST(3, 0, 0) - b) >> 1;
+        res = fixed32_mul(res, y);
     }
 
     return res;
 }
 
-fixed16_16 fixed16_16_inv_sqrt(fixed16_16 num) {
-    fixed16_16 y = fixed16_16_estimate_inv_sqrt(num);
+fixed32 fixed32_inv_sqrt(fixed32 num) {
+    fixed32 y = fixed32_estimate_inv_sqrt(num);
 
-    fixed16_16 b = num;
-    fixed16_16 res = y;
+    fixed32 b = num;
+    fixed32 res = y;
 
     for (uint32_t i = 0; i < 4; i++) { // 4 iterations are tested to be enough for 2% of relative precision.
-        b = fixed16_16_mul(fixed16_16_mul(b, y), y);
-        y = (FIXED16_16_CONST(3, 0, 0) - b) >> 1;
-        res = fixed16_16_mul(res, y);
+        b = fixed32_mul(fixed32_mul(b, y), y);
+        y = (FIXED32_CONST(3, 0, 0) - b) >> 1;
+        res = fixed32_mul(res, y);
     }
 
     return res;
