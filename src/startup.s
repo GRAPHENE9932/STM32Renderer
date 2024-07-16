@@ -66,7 +66,7 @@ default_handler:
 
 .type copy_data, %function
 copy_data:
-    ldr R0, =_etext     @ R0 stores the address of the current byte in flash.
+    ldr R0, =_sidata    @ R0 stores the address of the current byte in flash.
     ldr R1, =_sdata     @ R1 stores the address of the current byte in SRAM.
 
     ldr R2, =_edata
