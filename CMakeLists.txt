@@ -23,14 +23,18 @@ add_executable(
 
     src/startup.s
     src/main.c
+    src/frame_drawing.c
     src/i2c.c
     src/sh1106.c
-    src/fixed16_16.c
-    src/fixed32.c
     src/math/fixed32.c
     src/runtime_abi.c
+    src/rendering/rasterization.c
+    src/rendering/vertex_processing.c
+    src/rendering/camera.c
+    src/rendering/model.c
     src/math/quat.c
     src/math/vec3.c
+    src/math/mat4.c
 )
 
 target_compile_options(
