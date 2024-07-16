@@ -11,5 +11,6 @@ struct vec3 {
 
 fixed32 vec3_dot(const struct vec3* a, const struct vec3* b);
 struct vec3 vec3_cross(const struct vec3* a, const struct vec3* b);
+void vec3_normalize(struct vec3* v);
 
 #endif // VEC3_H
