@@ -27,7 +27,7 @@ void i2c_initialize(void) {
 
     LL_I2C_InitTypeDef i2c1_init;
     i2c1_init.PeripheralMode = LL_I2C_MODE_I2C;
-    i2c1_init.Timing = 0xF000F3FF;
+    i2c1_init.Timing = 0x2000090E;
     i2c1_init.AnalogFilter = LL_I2C_ANALOGFILTER_DISABLE;
     i2c1_init.DigitalFilter = 0x00;
     i2c1_init.OwnAddress1 = 0x00;
