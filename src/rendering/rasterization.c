@@ -15,24 +15,15 @@ static bool is_inside_triangle(struct vec2 point, struct vec2* vertices) {
     fixed32 y3_minus_y1 = vertices[2].y - vertices[0].y;
 
     fixed32 denominator = fixed32_mul(y2_minus_y3, x1_minus_x3) + fixed32_mul(x3_minus_x2, y1_minus_y3);
+    fixed32 numerator_1 = fixed32_mul(y2_minus_y3, x_minus_x3) + fixed32_mul(x3_minus_x2, y_minus_y3);
+    fixed32 numerator_2 = fixed32_mul(y3_minus_y1, x_minus_x3) + fixed32_mul(x1_minus_x3, y_minus_y3);
 
-    fixed32 t1 = fixed32_div(
-        fixed32_mul(y2_minus_y3, x_minus_x3) +
-        fixed32_mul(x3_minus_x2, y_minus_y3),
-        denominator
-    );
-
-    fixed32 t2 = fixed32_div(
-        fixed32_mul(y3_minus_y1, x_minus_x3) +
-        fixed32_mul(x1_minus_x3, y_minus_y3),
-        denominator
-    );
-
-    fixed32 t3 = FIXED32_ONE - t1 - t2;
-
-    return FIXED32_ZERO <= t1 && t1 <= FIXED32_ONE &&
-        FIXED32_ZERO <= t2 && t2 <= FIXED32_ONE &&
-        FIXED32_ZERO <= t3 && t3 <= FIXED32_ONE;
+    if (denominator >= FIXED32_ZERO) {
+        return numerator_1 >= FIXED32_ZERO && numerator_2 >= FIXED32_ZERO && numerator_1 + numerator_2 <= denominator;
+    }
+    else {
+        return numerator_1 <= FIXED32_ZERO && numerator_2 <= FIXED32_ZERO && numerator_1 + numerator_2 >= denominator;
+    }
 }
 
 static struct vec2 to_screen_space(struct vec2 point) {
