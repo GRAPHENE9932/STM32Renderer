@@ -32,6 +32,7 @@ add_executable(
     src/rendering/vertex_processing.c
     src/rendering/camera.c
     src/rendering/model.c
+    src/rendering/text_drawing.c
     src/math/quat.c
     src/math/vec3.c
     src/math/mat4.c
