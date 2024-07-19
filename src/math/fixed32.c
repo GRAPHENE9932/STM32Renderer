@@ -1,4 +1,5 @@
 #include "math/fixed32.h"
+#include "math/binary_utils.h"
 
 #include <stdbool.h>
 
@@ -23,23 +24,6 @@ fixed32 fixed32_mul(fixed32 a, fixed32 b) {
     }
 
     return fixed32_mul_unsigned(a, b);
-}
-
-static uint32_t trailing_zeroes(uint32_t x) {
-    uint32_t count = 0;
-    uint32_t cur_mask = 0xFFFFFFFF;
-    uint32_t cur_power = 32;
-
-    while (cur_power != 0) {
-        cur_power >>= 1;
-        cur_mask <<= cur_power;
-        if (!(x & cur_mask)) {
-            count += cur_power;
-            x <<= cur_power;
-        }
-    }
-
-    return count;
 }
 
 static uint32_t div_48_bit_int_by_32_bit_int(uint64_t a, uint64_t b) {

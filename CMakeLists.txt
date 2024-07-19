@@ -20,12 +20,14 @@ add_executable(
 
     submodules/stm32f0xx_hal_driver/Src/stm32f0xx_ll_gpio.c
     submodules/stm32f0xx_hal_driver/Src/stm32f0xx_ll_i2c.c
+    submodules/stm32f0xx_hal_driver/Src/stm32f0xx_ll_tim.c
 
     src/startup.s
     src/main.c
     src/frame_drawing.c
     src/i2c.c
     src/sh1106.c
+    src/tim2.c
     src/math/fixed32.c
     src/runtime_abi.c
     src/rendering/rasterization.c
@@ -33,9 +35,11 @@ add_executable(
     src/rendering/camera.c
     src/rendering/model.c
     src/rendering/text_drawing.c
+    src/rendering/frametime_text.c
     src/math/quat.c
     src/math/vec3.c
     src/math/mat4.c
+    src/math/binary_utils.c
 )
 
 target_compile_options(

@@ -6,6 +6,7 @@ add_executable(stm32renderer_test
     main.c
     fixed32_test.c
     ../src/math/fixed32.c
+    ../src/math/binary_utils.c
     ../submodules/Unity/src/unity.c
 )
 

@@ -1,5 +1,6 @@
 #include "math/vec3.h"
 #include "rendering/camera.h"
+#include "rendering/frametime_text.h"
 #include "rendering/model.h"
 #include "rendering/rasterization.h"
 #include "rendering/vertex_processing.h"
@@ -32,6 +33,7 @@ static struct model model = {
 void draw_frame(uint8_t* color_buffer) {
     process_vertices(&model, &CAMERA, processed_vertices);
     rasterize_triangle(color_buffer, processed_vertices);
+    draw_frametime_text(color_buffer);
 
     model.rotation = quat_mul(&model.rotation, &ROTATE_RIGHT_BY_10_DEG);
 }

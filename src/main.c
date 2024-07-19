@@ -4,6 +4,7 @@
 
 #include "stm32f0xx_ll_bus.h"
 #include "stm32f0xx_ll_gpio.h"
+#include "tim2.h"
 
 static uint8_t color_buffer[BUFFERS_HEIGHT * BUFFERS_WIDTH / 8];
 
@@ -24,6 +25,7 @@ int main(void) {
 
     i2c_initialize();
     sh1106_initialize();
+    tim2_initialize();
 
     while (1) {
         LL_GPIO_TogglePin(GPIOA, LL_GPIO_PIN_11);
