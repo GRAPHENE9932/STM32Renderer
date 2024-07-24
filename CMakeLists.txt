@@ -21,6 +21,7 @@ add_executable(
     submodules/stm32f0xx_hal_driver/Src/stm32f0xx_ll_gpio.c
     submodules/stm32f0xx_hal_driver/Src/stm32f0xx_ll_i2c.c
     submodules/stm32f0xx_hal_driver/Src/stm32f0xx_ll_tim.c
+    submodules/stm32f0xx_hal_driver/Src/stm32f0xx_ll_dma.c
 
     src/startup.s
     src/main.c
@@ -55,6 +56,7 @@ target_compile_options(
     --param=min-pagesize=0
     -Wl,--relax,--gc-sections
     -nostdlib
+    -fno-jump-tables # Prevent the compiler from using __gnu_thumb1_case_uqi and other such functions, which are not implemented here.
     -mthumb
     -T ${LINKER_SCRIPT}
 )

@@ -4,6 +4,7 @@
 .section .text
 .global reset_handler
 .global default_handler
+.global dma_ch2_3_handler
 .global main
 .global isr_vector
 
@@ -49,7 +50,7 @@ isr_vector:
     .word default_handler
     .word default_handler
     .word default_handler
-    .word default_handler
+    .word i2c1_handler
     .word default_handler
     .word default_handler
     .word default_handler
