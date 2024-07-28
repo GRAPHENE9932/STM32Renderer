@@ -3,13 +3,22 @@
 
 #include "stm32f0xx_ll_bus.h"
 #include "stm32f0xx_ll_gpio.h"
+#include "stm32f0xx_ll_rcc.h"
 #include "tim2.h"
 
 static uint8_t color_buffer[BUFFERS_HEIGHT * BUFFERS_WIDTH / 8];
 
 void draw_frame(uint8_t* color_buffer);
 
+static void switch_to_hsi48(void) {
+    LL_RCC_HSI48_Enable();
+    while (!LL_RCC_HSI48_IsReady());
+    LL_RCC_SetSysClkSource(LL_RCC_SYS_CLKSOURCE_HSI48);
+}
+
 int main(void) {
+    switch_to_hsi48();
+
     LL_AHB1_GRP1_EnableClock(LL_AHB1_GRP1_PERIPH_GPIOB);
 
     LL_GPIO_InitTypeDef blinky_port;

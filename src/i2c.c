@@ -29,7 +29,7 @@ static void initialize_i2c(void) {
 
     LL_I2C_InitTypeDef i2c1_init;
     i2c1_init.PeripheralMode = LL_I2C_MODE_I2C;
-    i2c1_init.Timing = 0x2000090E;
+    i2c1_init.Timing = 0x0000020B;
     i2c1_init.AnalogFilter = LL_I2C_ANALOGFILTER_DISABLE;
     i2c1_init.DigitalFilter = 0x00;
     i2c1_init.OwnAddress1 = 0x00;
@@ -73,7 +73,6 @@ void i2c_dma_initialize(void) {
 static uint8_t* cur_data_ptr = 0;
 static uint16_t bytes_left = 0;
 static uint8_t cur_i2c_address = 0;
-static bool transfer_is_ongoing = false;
 static volatile bool transfer_is_ongoing = false;
 
 static void send_batch(void) {
