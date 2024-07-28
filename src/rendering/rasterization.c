@@ -4,27 +4,7 @@
 #include "math/fixed32.h"
 
 #include <stdbool.h>
-
-static bool is_inside_triangle(struct vec2 point, struct vec2* vertices) {
-    fixed32 y2_minus_y3 = vertices[1].y - vertices[2].y;
-    fixed32 x3_minus_x2 = vertices[2].x - vertices[1].x;
-    fixed32 x_minus_x3 = point.x - vertices[2].x;
-    fixed32 y_minus_y3 = point.y - vertices[2].y;
-    fixed32 x1_minus_x3 = vertices[0].x - vertices[2].x;
-    fixed32 y1_minus_y3 = vertices[0].y - vertices[2].y;
-    fixed32 y3_minus_y1 = vertices[2].y - vertices[0].y;
-
-    fixed32 denominator = fixed32_mul(y2_minus_y3, x1_minus_x3) + fixed32_mul(x3_minus_x2, y1_minus_y3);
-    fixed32 numerator_1 = fixed32_mul(y2_minus_y3, x_minus_x3) + fixed32_mul(x3_minus_x2, y_minus_y3);
-    fixed32 numerator_2 = fixed32_mul(y3_minus_y1, x_minus_x3) + fixed32_mul(x1_minus_x3, y_minus_y3);
-
-    if (denominator >= FIXED32_ZERO) {
-        return numerator_1 >= FIXED32_ZERO && numerator_2 >= FIXED32_ZERO && numerator_1 + numerator_2 <= denominator;
-    }
-    else {
-        return numerator_1 <= FIXED32_ZERO && numerator_2 <= FIXED32_ZERO && numerator_1 + numerator_2 >= denominator;
-    }
-}
+#include <stdint.h>
 
 static struct vec2 to_screen_space(struct vec2 point) {
     vec2_add_and_assign(&point, (struct vec2) {FIXED32_ONE, FIXED32_ONE});
@@ -36,17 +16,69 @@ static struct vec2 to_screen_space(struct vec2 point) {
     return point;
 }
 
-static uint8_t draw_byte(uint32_t x_div_8, uint32_t y, struct vec2* vertices) {
-    uint8_t result = 0;
+static fixed32 get_intersection_point_x(fixed32 y_of_line_1, const struct vec2* points_of_line_1[2]) {
+    const fixed32 x1y2 = fixed32_mul(points_of_line_1[0]->x, points_of_line_1[1]->y);
+    const fixed32 x2y1 = fixed32_mul(points_of_line_1[1]->x, points_of_line_1[0]->y);
+    const fixed32 x2_minus_x1 = points_of_line_1[1]->x - points_of_line_1[0]->x;
+    const fixed32 y2_minus_y1 = points_of_line_1[1]->y - points_of_line_1[0]->y;
 
-    for (uint32_t x_bit = 0; x_bit < 8; x_bit++) {
-        result |= is_inside_triangle(
-            (struct vec2) {fixed32_from_uint32(x_div_8 * 8 + x_bit), fixed32_from_uint32(y)},
-            vertices
-        ) << (7 - x_bit);
+    return fixed32_div(
+        x1y2 - x2y1 + fixed32_mul(x2_minus_x1, y_of_line_1),
+        y2_minus_y1
+    );
+}
+
+static void draw_line(uint8_t* buffer, const struct vec2* vertices, uint32_t y_int) {
+    const fixed32 y = fixed32_from_uint32(y_int) + FIXED32_CONST(0, 5, 0);
+
+    // Check if the line is intersecting the triangle. If it isn't, then just fill the whole line with zeroes.
+    if ((y < vertices[0].y && y < vertices[1].y && y < vertices[2].y) ||
+        (y > vertices[0].y && y > vertices[1].y && y > vertices[2].y)) {
+        for (uint_fast8_t i = 0; i < (BUFFERS_WIDTH >> 3); i++) {
+            buffer[i] = 0;
+        }
+        return;
     }
 
-    return result;
+    // Find the two sides of this triangle which intersect the line.
+    const struct vec2* intersecting_lines[2][2];
+    if ((vertices[0].y >= y && vertices[1].y < y && vertices[2].y < y) ||
+        (vertices[0].y <= y && vertices[1].y > y && vertices[2].y > y)) {
+        intersecting_lines[0][0] = &vertices[0];
+        intersecting_lines[0][1] = &vertices[1];
+        intersecting_lines[1][0] = &vertices[0];
+        intersecting_lines[1][1] = &vertices[2];
+    }
+    else if ((vertices[1].y >= y && vertices[0].y < y && vertices[2].y < y) ||
+             (vertices[1].y <= y && vertices[0].y > y && vertices[2].y > y)) {
+        intersecting_lines[0][0] = &vertices[1];
+        intersecting_lines[0][1] = &vertices[0];
+        intersecting_lines[1][0] = &vertices[1];
+        intersecting_lines[1][1] = &vertices[2];
+    }
+    else {
+        intersecting_lines[0][0] = &vertices[2];
+        intersecting_lines[0][1] = &vertices[0];
+        intersecting_lines[1][0] = &vertices[2];
+        intersecting_lines[1][1] = &vertices[1];
+    }
+
+    fixed32 intersection_x_1 = get_intersection_point_x(y, intersecting_lines[0]);
+    fixed32 intersection_x_2 = get_intersection_point_x(y, intersecting_lines[1]);
+    if (intersection_x_1 > intersection_x_2) {
+        fixed32 tmp = intersection_x_2;
+        intersection_x_2 = intersection_x_1;
+        intersection_x_1 = tmp;
+    }
+
+    fixed32 x = FIXED32_CONST(0, 5, 0);
+    for (uint_fast8_t i = 0; i < BUFFERS_WIDTH; i++) {
+        uint8_t pixel_enabled = intersection_x_1 <= x && x < intersection_x_2;
+        pixel_enabled <<= 7 - i % 8;
+        buffer[i / 8] |= pixel_enabled;
+
+        x += FIXED32_ONE;
+    }
 }
 
 void rasterize_triangle(uint8_t* buffer, const struct vec3* vertices) {
@@ -56,8 +88,6 @@ void rasterize_triangle(uint8_t* buffer, const struct vec3* vertices) {
     scr_space_vertices[2] = to_screen_space((struct vec2) {vertices[2].x, vertices[2].y});
 
     for (uint32_t y = 0; y < BUFFERS_HEIGHT; y++) {
-        for (uint32_t x_byte = 0; x_byte < BUFFERS_WIDTH / 8; x_byte++) {
-            buffer[y * BUFFERS_WIDTH / 8 + x_byte] = draw_byte(x_byte, y, scr_space_vertices);
-        }
+        draw_line(buffer + y * (BUFFERS_WIDTH >> 3), scr_space_vertices, y);
     }
 }
