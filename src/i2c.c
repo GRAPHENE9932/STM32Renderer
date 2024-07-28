@@ -73,6 +73,7 @@ void i2c_dma_initialize(void) {
 static uint8_t* cur_data_ptr = 0;
 static uint16_t bytes_left = 0;
 static uint8_t cur_i2c_address = 0;
+static bool transfer_is_ongoing = false;
 
 static void send_batch(void) {
     if (bytes_left == 0) {
@@ -98,7 +99,6 @@ static void send_batch(void) {
     }
     else {
         LL_I2C_DisableReloadMode(I2C1);
-        LL_I2C_EnableAutoEndMode(I2C1);
     }
 
     LL_I2C_EnableDMAReq_TX(I2C1);
@@ -107,7 +107,8 @@ static void send_batch(void) {
 }
 
 void i2c_dma_send(uint8_t address, uint8_t* data_ptr, uint16_t size) {
-    while (bytes_left != 0);
+    i2c_dma_wait_for_transfer_to_complete();
+    transfer_is_ongoing = true;
 
     cur_data_ptr = data_ptr;
     bytes_left = size;
@@ -118,11 +119,15 @@ void i2c_dma_send(uint8_t address, uint8_t* data_ptr, uint16_t size) {
         address << 1,
         LL_I2C_ADDRSLAVE_7BIT,
         size > 255 ? 255 : size,
-        size > 255 ? LL_I2C_MODE_RELOAD : LL_I2C_MODE_AUTOEND,
+        size > 255 ? LL_I2C_MODE_RELOAD : LL_I2C_MODE_SOFTEND,
         LL_I2C_GENERATE_START_WRITE
     );
 
     send_batch();
+}
+
+void i2c_dma_wait_for_transfer_to_complete(void) {
+    while (transfer_is_ongoing);
 }
 
 void dma1_ch2_3_handler(void) {
@@ -130,10 +135,13 @@ void dma1_ch2_3_handler(void) {
 }
 
 void i2c1_handler(void) {
-    if (!LL_I2C_IsActiveFlag_TCR(I2C1)) {
-        return;
+    if (LL_I2C_IsActiveFlag_TC(I2C1)) {
+        LL_I2C_GenerateStopCondition(I2C1);
+        LL_GPIO_TogglePin(GPIOB, LL_GPIO_PIN_3);
+        transfer_is_ongoing = false;
     }
 
-    LL_GPIO_TogglePin(GPIOB, LL_GPIO_PIN_3);
-    send_batch();
+    if (LL_I2C_IsActiveFlag_TCR(I2C1)) {
+        send_batch();
+    }
 }

@@ -63,6 +63,8 @@ static uint8_t get_line_byte(const uint8_t* data, uint8_t col, uint8_t page) {
 }
 
 void sh1106_send_display_data(const uint8_t* data) {
+    i2c_dma_wait_for_transfer_to_complete();
+
     uint32_t offset_in_buffer = 0;
 
     for (uint_fast8_t page = 0; page < SH1106_HEIGHT / 8; page++) {
