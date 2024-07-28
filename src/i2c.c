@@ -74,6 +74,7 @@ static uint8_t* cur_data_ptr = 0;
 static uint16_t bytes_left = 0;
 static uint8_t cur_i2c_address = 0;
 static bool transfer_is_ongoing = false;
+static volatile bool transfer_is_ongoing = false;
 
 static void send_batch(void) {
     if (bytes_left == 0) {
