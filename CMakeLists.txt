@@ -58,6 +58,7 @@ target_compile_options(
     -nostdlib
     -fno-jump-tables # Prevent the compiler from using __gnu_thumb1_case_uqi and other such functions, which are not implemented here.
     -mthumb
+    -ffreestanding
     -T ${LINKER_SCRIPT}
 )
 
