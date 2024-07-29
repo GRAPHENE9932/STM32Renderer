@@ -72,7 +72,6 @@ static const struct vec3 VERTICES[60] = {
     {0x000046c1, 0x0000727c, 0xffff263d},
     {0x00000000, 0x00010000, 0x00000000}
 };
-struct vec3 processed_vertices[60];
 
 static const struct camera CAMERA = {
     {FIXED32_ONE, FIXED32_ZERO, FIXED32_ZERO, FIXED32_ZERO},
@@ -87,7 +86,7 @@ static struct model model = {
     {FIXED32_ONE, FIXED32_ZERO, FIXED32_ZERO, FIXED32_ZERO},
     {FIXED32_ZERO, FIXED32_ZERO, FIXED32_CONST(-2, 0, 0)},
     VERTICES,
-    20
+    60
 };
 
 static void clear_frame(uint8_t* color_buffer) {
@@ -96,14 +95,21 @@ static void clear_frame(uint8_t* color_buffer) {
     }
 }
 
+static void draw_model(uint8_t* color_buffer, const struct camera* camera, const struct model* model) {
+    mat4 mvp;
+    produce_mvp_matrix(model, camera, &mvp);
+    struct vec3 processed_vertices[3];
+    for (uint32_t i = 0; i < model->vertices_count; i += 3) {
+        process_triangle(&mvp, model->vertices + i, processed_vertices);
+        rasterize_triangle(color_buffer, processed_vertices);
+    }
+}
+
 void draw_frame(uint8_t* color_buffer) {
     quat_normalize(&model.rotation);
     clear_frame(color_buffer);
-    process_vertices(&model, &CAMERA, processed_vertices);
 
-    for (uint32_t i = 0; i < 60; i += 3) {
-        rasterize_triangle(color_buffer, processed_vertices + i);
-    }
+    draw_model(color_buffer, &CAMERA, &model);
 
     draw_frametime_text(color_buffer);
 

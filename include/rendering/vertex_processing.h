@@ -5,6 +5,7 @@
 #include "camera.h"
 #include "math/vec3.h"
 
-void process_vertices(const struct model* model, const struct camera* camera, struct vec3* result);
+void produce_mvp_matrix(const struct model* model, const struct camera* camera, mat4* out);
+void process_triangle(const mat4* mvp, const struct vec3* source, struct vec3* result);
 
 #endif // VERTEX_PROCESSING_H
