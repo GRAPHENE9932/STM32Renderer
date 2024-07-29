@@ -19,7 +19,7 @@ void process_vertices(const struct model* model, const struct camera* camera, st
         mat4_mul(&mvp, &vp, &m);
     }
 
-    for (uint8_t i = 0; i < model->vertices_count; i++) {
+    for (uint8_t i = 0; i < model->vertices_count * 3; i++) {
         struct vec4 v_src = vec4_from_vec3(&model->vertices[i], FIXED32_ONE);
         struct vec4 v_out = mat4_mul_vec4(&mvp, &v_src);
         result[i].x = fixed32_div(v_out.x, v_out.w);
