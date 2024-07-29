@@ -14,6 +14,7 @@ static void switch_to_hsi48(void) {
     LL_RCC_HSI48_Enable();
     while (!LL_RCC_HSI48_IsReady());
     LL_RCC_SetSysClkSource(LL_RCC_SYS_CLKSOURCE_HSI48);
+    while (LL_RCC_GetSysClkSource() != LL_RCC_SYS_CLKSOURCE_STATUS_HSI48);
 }
 
 int main(void) {
