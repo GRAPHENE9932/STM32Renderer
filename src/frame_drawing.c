@@ -39,6 +39,7 @@ static void clear_frame(uint8_t* color_buffer) {
 }
 
 void draw_frame(uint8_t* color_buffer) {
+    quat_normalize(&model.rotation);
     clear_frame(color_buffer);
     process_vertices(&model, &CAMERA, processed_vertices);
     rasterize_triangle(color_buffer, processed_vertices);

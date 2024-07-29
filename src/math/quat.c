@@ -48,3 +48,17 @@ struct vec3 quat_mul_by_vec3(const struct quat* q, const struct vec3* v) {
 
     return vec3_from_pure_quat(&result_quat);
 }
+
+void quat_normalize(struct quat* q) {
+    const fixed32 length = fixed32_sqrt(
+        fixed32_mul(q->w, q->w) +
+        fixed32_mul(q->x, q->x) +
+        fixed32_mul(q->y, q->y) +
+        fixed32_mul(q->z, q->z)
+    );
+
+    q->w = fixed32_div(q->w, length);
+    q->x = fixed32_div(q->x, length);
+    q->y = fixed32_div(q->y, length);
+    q->z = fixed32_div(q->z, length);
+}
