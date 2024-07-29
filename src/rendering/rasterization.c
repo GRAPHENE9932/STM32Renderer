@@ -34,9 +34,6 @@ static void draw_line(uint8_t* buffer, const struct vec2* vertices, uint32_t y_i
     // Check if the line is intersecting the triangle. If it isn't, then just fill the whole line with zeroes.
     if ((y < vertices[0].y && y < vertices[1].y && y < vertices[2].y) ||
         (y > vertices[0].y && y > vertices[1].y && y > vertices[2].y)) {
-        for (uint_fast8_t i = 0; i < (BUFFERS_WIDTH >> 3); i++) {
-            buffer[i] = 0;
-        }
         return;
     }
 
