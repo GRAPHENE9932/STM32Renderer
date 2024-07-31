@@ -6,14 +6,32 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-static struct vec2 to_screen_space(struct vec2 point) {
-    vec2_add_and_assign(&point, (struct vec2) {FIXED32_ONE, FIXED32_ONE});
-    vec2_mul_and_assign(&point, (struct vec2) {FIXED32_CONST(BUFFERS_WIDTH / 2, 0, 0), FIXED32_CONST(BUFFERS_HEIGHT / 2, 0, 0)});
-    point = vec2_sub(
-        (struct vec2) {FIXED32_CONST(BUFFERS_WIDTH, 0, 0), FIXED32_CONST(BUFFERS_HEIGHT, 0, 0)},
-        point
-    );
-    return point;
+static const struct vec3 LIGHT_DIR = {
+    FIXED32_CONST(0, -707106781186548, 0),
+    FIXED32_CONST(0, -707106781186548, 0),
+    FIXED32_ZERO
+};
+
+static const uint8_t BAYER_MATRIX[4][4] = {
+    {0, 12, 3, 15},
+    {8, 4, 11, 7},
+    {2, 14, 1, 13},
+    {10, 6, 9, 5}
+};
+
+static fixed32 compute_fragment_color(const struct vec3* normal) {
+    struct vec3 neg_light_dir = vec3_neg(LIGHT_DIR);
+    fixed32 result = vec3_dot(normal, &neg_light_dir);
+    if (result < FIXED32_ZERO) {
+        result = FIXED32_ZERO;
+    }
+
+    return result;
+}
+
+static bool dither_color_to_monochrome(uint32_t x, uint32_t y, fixed32 grayscale_color) {
+    fixed32 threshold = BAYER_MATRIX[x & 3][y & 3] << 12;
+    return grayscale_color > threshold;
 }
 
 static fixed32 get_intersection_point_x(fixed32 y_of_line_1, const struct vec2* points_of_line_1[2]) {
@@ -28,10 +46,10 @@ static fixed32 get_intersection_point_x(fixed32 y_of_line_1, const struct vec2* 
     );
 }
 
-static void draw_line(uint8_t* buffer, const struct vec2* vertices, uint32_t y_int) {
+static void draw_line(uint8_t* buffer, const struct vec2* vertices, const struct vec3* normal, uint32_t y_int) {
     const fixed32 y = fixed32_from_uint32(y_int) + FIXED32_CONST(0, 5, 0);
 
-    // Check if the line is intersecting the triangle. If it isn't, then just fill the whole line with zeroes.
+    // Check if the line is intersecting the triangle. If it isn't, do nothing.
     if ((y < vertices[0].y && y < vertices[1].y && y < vertices[2].y) ||
         (y > vertices[0].y && y > vertices[1].y && y > vertices[2].y)) {
         return;
@@ -70,21 +88,37 @@ static void draw_line(uint8_t* buffer, const struct vec2* vertices, uint32_t y_i
 
     fixed32 x = FIXED32_CONST(0, 5, 0);
     for (uint_fast8_t i = 0; i < BUFFERS_WIDTH; i++) {
-        uint8_t pixel_enabled = intersection_x_1 <= x && x < intersection_x_2;
+        bool pixel_in_triangle = intersection_x_1 <= x && x < intersection_x_2;
+        x += FIXED32_ONE;
+
+        if (!pixel_in_triangle) {
+            continue;
+        }
+
+        fixed32 color = compute_fragment_color(normal);
+        uint8_t pixel_enabled = dither_color_to_monochrome(i, y_int, color);
         pixel_enabled <<= 7 - i % 8;
         buffer[i / 8] |= pixel_enabled;
-
-        x += FIXED32_ONE;
     }
 }
 
-void rasterize_triangle(uint8_t* buffer, const struct vec3* vertices) {
+static struct vec2 to_screen_space(struct vec2 point) {
+    vec2_add_and_assign(&point, (struct vec2) {FIXED32_ONE, FIXED32_ONE});
+    vec2_mul_and_assign(&point, (struct vec2) {FIXED32_CONST(BUFFERS_WIDTH / 2, 0, 0), FIXED32_CONST(BUFFERS_HEIGHT / 2, 0, 0)});
+    point = vec2_sub(
+        (struct vec2) {FIXED32_CONST(BUFFERS_WIDTH, 0, 0), FIXED32_CONST(BUFFERS_HEIGHT, 0, 0)},
+        point
+    );
+    return point;
+}
+
+void rasterize_triangle(uint8_t* buffer, const struct vec3* vertices, const struct vec3* normal) {
     struct vec2 scr_space_vertices[3];
     scr_space_vertices[0] = to_screen_space((struct vec2) {vertices[0].x, vertices[0].y});
     scr_space_vertices[1] = to_screen_space((struct vec2) {vertices[1].x, vertices[1].y});
     scr_space_vertices[2] = to_screen_space((struct vec2) {vertices[2].x, vertices[2].y});
 
     for (uint32_t y = 0; y < BUFFERS_HEIGHT; y++) {
-        draw_line(buffer + y * (BUFFERS_WIDTH >> 3), scr_space_vertices, y);
+        draw_line(buffer + y * (BUFFERS_WIDTH >> 3), scr_space_vertices, normal, y);
     }
 }

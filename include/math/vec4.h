@@ -20,4 +20,12 @@ static inline struct vec4 vec4_from_vec3(const struct vec3* v, fixed32 w) {
     };
 }
 
+static inline struct vec3 vec3_from_vec4(const struct vec4* v) {
+    return (struct vec3) {
+        v->x,
+        v->y,
+        v->z
+    };
+}
+
 #endif // VEC4_H
