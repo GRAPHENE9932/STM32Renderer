@@ -104,15 +104,49 @@ def float_to_fixed32_hex(number):
 
     return "0x" + hex(int_number)[2:].zfill(8)
 
-def dump_vectors_in_fixed32_hex(vertices):
+def dump_vectors_in_fixed32_hex(identation_spaces, vertices):
+    result = ""
     for i in range(len(vertices)):
         if i % 3 == 0:
-            print("{", end="")
+            result += " " * identation_spaces
+            result += "{"
 
-        if (i + 1) % 3 == 0:
-            print(float_to_fixed32_hex(vertices[i]), end="}, \n")
+        end = None
+        if i == len(vertices) - 1:
+            end = "}"
+        elif (i + 1) % 3 == 0:
+            end = "}, \n"
         else:
-            print(float_to_fixed32_hex(vertices[i]), end=", ")
+            end = ", "
+
+        result += float_to_fixed32_hex(vertices[i])
+        result += end
+
+    return result
+
+def form_a_header_file(vertices, normals):
+    return """
+#ifndef MESH_DATA_H
+#define MESH_DATA_H
+
+#include "math/vec3.h"
+
+#define TRIANGLES_COUNT {}
+
+static const struct vec3 VERTICES[TRIANGLES_COUNT * 3] = {{
+{}
+}};
+
+static const struct vec3 NORMALS[TRIANGLES_COUNT] = {{
+{}
+}};
+
+#endif // MESH_DATA_H
+    """.format(
+        len(vertices) // 9,
+        dump_vectors_in_fixed32_hex(4, vertices),
+        dump_vectors_in_fixed32_hex(4, normals)
+    )
 
 def main():
     arg_parser = argparse.ArgumentParser(description="""
@@ -133,12 +167,7 @@ def main():
     vertices = combine_vertices(vertices_list, faces_list)
     normals = combine_normals(normals_list, faces_list)
 
-    print("VERTICES:")
-    dump_vectors_in_fixed32_hex(vertices)
-    print("\nNORMALS:")
-    dump_vectors_in_fixed32_hex(normals)
-
-    print("\nvertices: {}, triangles: {}".format(len(vertices) // 3, len(vertices) // 9))
+    print(form_a_header_file(vertices, normals))
 
 if __name__ == "__main__":
     main()
