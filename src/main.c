@@ -2,6 +2,7 @@
 #include "sh1106.h"
 
 #include "stm32f0xx_ll_rcc.h"
+#include "stm32f0xx_ll_system.h"
 #include "tim2.h"
 
 static uint8_t color_buffer[BUFFERS_HEIGHT * BUFFERS_WIDTH / 8];
@@ -9,6 +10,8 @@ static uint8_t color_buffer[BUFFERS_HEIGHT * BUFFERS_WIDTH / 8];
 void draw_frame(uint8_t* color_buffer);
 
 static void switch_to_hsi48(void) {
+    LL_FLASH_SetLatency(LL_FLASH_LATENCY_1);
+
     LL_RCC_HSI48_Enable();
     while (!LL_RCC_HSI48_IsReady());
     LL_RCC_SetSysClkSource(LL_RCC_SYS_CLKSOURCE_HSI48);
