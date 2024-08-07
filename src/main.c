@@ -20,18 +20,6 @@ static void switch_to_hsi48(void) {
 int main(void) {
     switch_to_hsi48();
 
-    LL_AHB1_GRP1_EnableClock(LL_AHB1_GRP1_PERIPH_GPIOB);
-
-    LL_GPIO_InitTypeDef blinky_port;
-    blinky_port.Pin = LL_GPIO_PIN_3;
-    blinky_port.Mode = LL_GPIO_MODE_OUTPUT;
-    blinky_port.Speed = LL_GPIO_SPEED_FREQ_LOW;
-    blinky_port.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
-    blinky_port.Pull = LL_GPIO_PULL_NO;
-    blinky_port.Alternate = LL_GPIO_AF_0;
-
-    LL_GPIO_Init(GPIOB, &blinky_port);
-
     sh1106_initialize();
     tim2_initialize();
 

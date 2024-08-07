@@ -137,7 +137,6 @@ void dma1_ch2_3_handler(void) {
 void i2c1_handler(void) {
     if (LL_I2C_IsActiveFlag_TC(I2C1)) {
         LL_I2C_GenerateStopCondition(I2C1);
-        LL_GPIO_TogglePin(GPIOB, LL_GPIO_PIN_3);
         transfer_is_ongoing = false;
     }
 
