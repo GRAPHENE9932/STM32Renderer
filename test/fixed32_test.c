@@ -224,11 +224,3 @@ void test_fixed32_inv_sqrt(void) {
 
     TEST_ASSERT_LESS_THAN_DOUBLE(0.02, max_relative_error); // Expect 2% of precision.
 }
-
-void test_fixed32_sin(void) {
-
-}
-
-void test_fixed32_cos(void) {
-    
-}

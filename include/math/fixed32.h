@@ -113,9 +113,6 @@ fixed32 fixed32_div(fixed32 a, fixed32 b);
 fixed32 fixed32_sqrt(fixed32 num);
 fixed32 fixed32_inv_sqrt(fixed32 num);
 
-fixed32 fixed32_sin(fixed32 rad);
-fixed32 fixed32_cos(fixed32 rad);
-
 static inline fixed32 fixed32_from_uint32(uint32_t num) {
     return num << 16;
 }
