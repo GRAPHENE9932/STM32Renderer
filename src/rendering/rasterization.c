@@ -7,9 +7,9 @@
 #include <stdint.h>
 
 static const struct vec3 LIGHT_DIR = {
-    FIXED32_CONST(0, -707106781186548, 0),
-    FIXED32_CONST(0, -707106781186548, 0),
-    FIXED32_ZERO
+    FIXED32_CONST(0, 577350269189, 0),
+    FIXED32_CONST(0, -577350269189, 0),
+    FIXED32_CONST(0, -577350269189, 0)
 };
 
 static const uint8_t BAYER_MATRIX[4][4] = {
