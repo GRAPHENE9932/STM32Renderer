@@ -30,7 +30,7 @@ static fixed32 compute_fragment_color(const struct vec3* normal) {
 }
 
 static bool dither_color_to_monochrome(uint32_t x, uint32_t y, fixed32 grayscale_color) {
-    fixed32 threshold = BAYER_MATRIX[x & 3][y & 3] << 12;
+    fixed32 threshold = BAYER_MATRIX[x & 0b11][y & 0b11] << 12;
     return grayscale_color > threshold;
 }
 
@@ -46,40 +46,48 @@ static fixed32 get_intersection_point_x(fixed32 y_of_line_1, const struct vec2* 
     );
 }
 
+static bool line_intersection_test(const struct vec2* vertices, fixed32 line_y) {
+    return !((line_y < vertices[0].y && line_y < vertices[1].y && line_y < vertices[2].y) ||
+        (line_y > vertices[0].y && line_y > vertices[1].y && line_y > vertices[2].y));
+}
+
+static void extract_intersecting_sides(const struct vec2* vertices, fixed32 y, const struct vec2 *(*out)[2]) {
+    if ((vertices[0].y >= y && vertices[1].y < y && vertices[2].y < y) ||
+        (vertices[0].y <= y && vertices[1].y > y && vertices[2].y > y)) {
+        out[0][0] = &vertices[0];
+        out[0][1] = &vertices[1];
+        out[1][0] = &vertices[0];
+        out[1][1] = &vertices[2];
+    }
+    else if ((vertices[1].y >= y && vertices[0].y < y && vertices[2].y < y) ||
+             (vertices[1].y <= y && vertices[0].y > y && vertices[2].y > y)) {
+        out[0][0] = &vertices[1];
+        out[0][1] = &vertices[0];
+        out[1][0] = &vertices[1];
+        out[1][1] = &vertices[2];
+    }
+    else {
+        out[0][0] = &vertices[2];
+        out[0][1] = &vertices[0];
+        out[1][0] = &vertices[2];
+        out[1][1] = &vertices[1];
+    }
+}
+
 static void draw_line(uint8_t* buffer, const struct vec2* vertices, const struct vec3* normal, uint32_t y_int) {
     const fixed32 y = fixed32_from_uint32(y_int) + FIXED32_CONST(0, 5, 0);
 
     // Check if the line is intersecting the triangle. If it isn't, do nothing.
-    if ((y < vertices[0].y && y < vertices[1].y && y < vertices[2].y) ||
-        (y > vertices[0].y && y > vertices[1].y && y > vertices[2].y)) {
+    if (!line_intersection_test(vertices, y)) {
         return;
     }
 
     // Find the two sides of this triangle which intersect the line.
-    const struct vec2* intersecting_lines[2][2];
-    if ((vertices[0].y >= y && vertices[1].y < y && vertices[2].y < y) ||
-        (vertices[0].y <= y && vertices[1].y > y && vertices[2].y > y)) {
-        intersecting_lines[0][0] = &vertices[0];
-        intersecting_lines[0][1] = &vertices[1];
-        intersecting_lines[1][0] = &vertices[0];
-        intersecting_lines[1][1] = &vertices[2];
-    }
-    else if ((vertices[1].y >= y && vertices[0].y < y && vertices[2].y < y) ||
-             (vertices[1].y <= y && vertices[0].y > y && vertices[2].y > y)) {
-        intersecting_lines[0][0] = &vertices[1];
-        intersecting_lines[0][1] = &vertices[0];
-        intersecting_lines[1][0] = &vertices[1];
-        intersecting_lines[1][1] = &vertices[2];
-    }
-    else {
-        intersecting_lines[0][0] = &vertices[2];
-        intersecting_lines[0][1] = &vertices[0];
-        intersecting_lines[1][0] = &vertices[2];
-        intersecting_lines[1][1] = &vertices[1];
-    }
+    const struct vec2* intersecting_sides[2][2];
+    extract_intersecting_sides(vertices, y, intersecting_sides);
 
-    fixed32 intersection_x_1 = get_intersection_point_x(y, intersecting_lines[0]);
-    fixed32 intersection_x_2 = get_intersection_point_x(y, intersecting_lines[1]);
+    fixed32 intersection_x_1 = get_intersection_point_x(y, intersecting_sides[0]);
+    fixed32 intersection_x_2 = get_intersection_point_x(y, intersecting_sides[1]);
     if (intersection_x_1 > intersection_x_2) {
         fixed32 tmp = intersection_x_2;
         intersection_x_2 = intersection_x_1;
