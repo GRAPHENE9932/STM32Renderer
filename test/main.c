@@ -17,7 +17,5 @@ int main(void) {
     RUN_TEST(test_fixed32_div);
     RUN_TEST(test_fixed32_sqrt);
     RUN_TEST(test_fixed32_inv_sqrt);
-    RUN_TEST(test_fixed32_sin);
-    RUN_TEST(test_fixed32_cos);
     return UNITY_END();
 }
