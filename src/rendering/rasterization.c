@@ -105,6 +105,11 @@ static void draw_line(uint8_t* buffer, const struct vec2* vertices, const struct
 
         fixed32 color = compute_fragment_color(normal);
         uint8_t pixel_enabled = dither_color_to_monochrome(i, y_int, color);
+
+        if (!pixel_enabled) {
+            continue;
+        }
+        
         pixel_enabled <<= 7 - i % 8;
         buffer[i / 8] |= pixel_enabled;
     }
