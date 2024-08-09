@@ -1,4 +1,5 @@
 #include "i2c.h"
+#include "constants.h"
 
 #include <stm32f0xx_ll_bus.h>
 #include <stm32f0xx_ll_gpio.h>
@@ -27,15 +28,9 @@ static void initialize_i2c(void) {
     i2c1_scl.Alternate = LL_GPIO_AF_4;
     LL_GPIO_Init(GPIOA, &i2c1_scl);
 
-    LL_I2C_InitTypeDef i2c1_init;
-    i2c1_init.PeripheralMode = LL_I2C_MODE_I2C;
-    i2c1_init.Timing = 0x0000020B;
-    i2c1_init.AnalogFilter = LL_I2C_ANALOGFILTER_DISABLE;
-    i2c1_init.DigitalFilter = 0x00;
-    i2c1_init.OwnAddress1 = 0x00;
-    i2c1_init.TypeAcknowledge = LL_I2C_ACK;
-    i2c1_init.OwnAddrSize = LL_I2C_OWNADDRESS1_7BIT;
-    LL_I2C_Init(I2C1, &i2c1_init);
+    _Static_assert(CK_INT_FREQ == 48000000, "The I2C timing is configured for 48 MHz clock frequency only.");
+    LL_I2C_SetTiming(I2C1, 0x0000020B); // 400 kHz on 48 MHz
+    LL_I2C_SetMode(I2C1, LL_I2C_MODE_I2C);
     LL_I2C_SetMasterAddressingMode(I2C1, LL_I2C_ADDRESSING_MODE_7BIT);
     LL_I2C_DisableClockStretching(I2C1);
     LL_I2C_EnableDMAReq_TX(I2C1);

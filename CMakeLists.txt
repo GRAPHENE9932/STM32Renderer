@@ -19,7 +19,6 @@ add_executable(
     stm32renderer
 
     submodules/stm32f0xx_hal_driver/Src/stm32f0xx_ll_gpio.c
-    submodules/stm32f0xx_hal_driver/Src/stm32f0xx_ll_i2c.c
 
     src/startup.s
     src/main.c
