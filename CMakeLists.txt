@@ -44,7 +44,7 @@ target_compile_options(
     stm32renderer PRIVATE
     -mcpu=${CPU}
     -std=gnu11
-    $<$<CONFIG:Release>:-Os>
+    $<$<OR:$<CONFIG:Release>,$<CONFIG:RelWithDebInfo>>:-O3>
     -Wall
     -Wno-main
     -Wundef
