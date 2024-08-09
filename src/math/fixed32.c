@@ -115,12 +115,12 @@ fixed32 fixed32_sqrt(fixed32 num) {
     fixed32 y = fixed32_estimate_inv_sqrt(num);
 
     fixed32 b = num;
-    fixed32 res = fixed32_mul(num, y);
+    fixed32 res = fixed32_mul_unsigned(num, y);
 
     for (uint32_t i = 0; i < 4; i++) { // 4 iterations are tested to be enough for 2% of relative precision.
-        b = fixed32_mul(fixed32_mul(b, y), y);
+        b = fixed32_mul_unsigned(fixed32_mul_unsigned(b, y), y);
         y = (FIXED32_CONST(3, 0, 0) - b) >> 1;
-        res = fixed32_mul(res, y);
+        res = fixed32_mul_unsigned(res, y);
     }
 
     return res;
@@ -133,9 +133,9 @@ fixed32 fixed32_inv_sqrt(fixed32 num) {
     fixed32 res = y;
 
     for (uint32_t i = 0; i < 4; i++) { // 4 iterations are tested to be enough for 2% of relative precision.
-        b = fixed32_mul(fixed32_mul(b, y), y);
+        b = fixed32_mul_unsigned(fixed32_mul_unsigned(b, y), y);
         y = (FIXED32_CONST(3, 0, 0) - b) >> 1;
-        res = fixed32_mul(res, y);
+        res = fixed32_mul_unsigned(res, y);
     }
 
     return res;
