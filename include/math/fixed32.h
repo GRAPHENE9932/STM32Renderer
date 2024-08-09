@@ -125,4 +125,8 @@ static inline fixed32 fixed32_abs(fixed32 num) {
     return num < FIXED32_ZERO ? -num : num;
 }
 
+static inline uint32_t fixed32_round_to_uint32(fixed32 num) {
+    return (num + FIXED32_ONE / 2) >> 16;
+}
+
 #endif // FIXED32

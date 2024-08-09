@@ -24,4 +24,8 @@ static inline struct vec2 vec2_sub(struct vec2 a, struct vec2 b) {
     return a;
 }
 
+static inline fixed32 vec2_cross(struct vec2 a, struct vec2 b) {
+    return fixed32_mul(a.x, b.y) - fixed32_mul(a.y, b.x);
+}
+
 #endif // VEC2_H
