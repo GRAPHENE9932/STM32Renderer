@@ -49,18 +49,19 @@ static void initialize_i2c(void) {
 static void initialize_dma() {
     LL_AHB1_GRP1_EnableClock(LL_AHB1_GRP1_PERIPH_DMA1);
 
-    LL_DMA_InitTypeDef dma_init_struct;
-    dma_init_struct.PeriphOrM2MSrcAddress = LL_I2C_DMA_GetRegAddr(I2C1, LL_I2C_DMA_REG_DATA_TRANSMIT);
-    dma_init_struct.MemoryOrM2MDstAddress = 0;
-    dma_init_struct.Direction = LL_DMA_DIRECTION_MEMORY_TO_PERIPH;
-    dma_init_struct.Mode = LL_DMA_MODE_NORMAL;
-    dma_init_struct.PeriphOrM2MSrcIncMode = LL_DMA_PERIPH_NOINCREMENT;
-    dma_init_struct.MemoryOrM2MDstIncMode = LL_DMA_MEMORY_INCREMENT;
-    dma_init_struct.PeriphOrM2MSrcDataSize = LL_DMA_PDATAALIGN_BYTE;
-    dma_init_struct.MemoryOrM2MDstDataSize = LL_DMA_MDATAALIGN_BYTE;
-    dma_init_struct.NbData = 0;
-    dma_init_struct.Priority = LL_DMA_PRIORITY_LOW;
-    LL_DMA_Init(DMA1, LL_DMA_CHANNEL_2, &dma_init_struct);
+    LL_DMA_ConfigTransfer(
+        DMA1,
+        LL_DMA_CHANNEL_2,
+        LL_DMA_DIRECTION_MEMORY_TO_PERIPH |
+        LL_DMA_MODE_NORMAL |
+        LL_DMA_PERIPH_NOINCREMENT |
+        LL_DMA_MEMORY_INCREMENT |
+        LL_DMA_PDATAALIGN_BYTE |
+        LL_DMA_MDATAALIGN_BYTE |
+        LL_DMA_PRIORITY_LOW
+    );
+    LL_DMA_SetPeriphAddress(DMA1, LL_DMA_CHANNEL_2, LL_I2C_DMA_GetRegAddr(I2C1, LL_I2C_DMA_REG_DATA_TRANSMIT));
+    LL_DMA_SetMemoryAddress(DMA1, LL_DMA_CHANNEL_2, 0);
 
     LL_DMA_EnableChannel(DMA1, LL_DMA_CHANNEL_2);
 }

@@ -20,7 +20,6 @@ add_executable(
 
     submodules/stm32f0xx_hal_driver/Src/stm32f0xx_ll_gpio.c
     submodules/stm32f0xx_hal_driver/Src/stm32f0xx_ll_i2c.c
-    submodules/stm32f0xx_hal_driver/Src/stm32f0xx_ll_dma.c
 
     src/startup.s
     src/main.c
