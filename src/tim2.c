@@ -7,15 +7,13 @@
 void tim2_initialize(void) {
     LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_TIM2);
 
-    LL_TIM_InitTypeDef init_struct;
-    init_struct.Prescaler = CK_INT_FREQ / 10000; // CK_CNT increments every 100 us.
-    init_struct.CounterMode = LL_TIM_COUNTERMODE_UP;
-    init_struct.Autoreload = 0xFFFFFFFF;
-    init_struct.ClockDivision = LL_TIM_CLOCKDIVISION_DIV1;
-    init_struct.RepetitionCounter = 0;
-
-    LL_TIM_Init(TIM2, &init_struct);
+    LL_TIM_SetPrescaler(TIM2, CK_INT_FREQ / 10000); // CK_CNT increments every 100 us.
+    LL_TIM_SetCounterMode(TIM2, LL_TIM_COUNTERMODE_UP);
+    LL_TIM_SetAutoReload(TIM2, 0xFFFFFFFF);
+    LL_TIM_SetClockDivision(TIM2, LL_TIM_CLOCKDIVISION_DIV1);
+    LL_TIM_SetRepetitionCounter(TIM2, 0);
     LL_TIM_EnableCounter(TIM2);
+    LL_TIM_GenerateEvent_UPDATE(TIM2);
 }
 
 void tim2_reset(void) {
