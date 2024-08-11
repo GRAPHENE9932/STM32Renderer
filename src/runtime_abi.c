@@ -3,7 +3,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-uint64_t __aeabi_llsl(uint64_t a, uint32_t b) {
+__attribute__((used)) uint64_t __aeabi_llsl(uint64_t a, uint32_t b) {
     uint32_t* low = (uint32_t*)&a;
     uint32_t* high = low + 1;
 
@@ -20,7 +20,7 @@ uint64_t __aeabi_llsl(uint64_t a, uint32_t b) {
     return a;
 }
 
-uint64_t __aeabi_uidivmod(uint32_t numerator, uint32_t denominator) {
+__attribute__((used)) uint64_t __aeabi_uidivmod(uint32_t numerator, uint32_t denominator) {
     uint32_t quot = 0;
     uint32_t cur_power = trailing_zeroes(denominator);
     uint32_t rem = numerator;
@@ -46,6 +46,6 @@ uint64_t __aeabi_uidivmod(uint32_t numerator, uint32_t denominator) {
     return result;
 }
 
-uint32_t __aeabi_uidiv(uint32_t numerator, uint32_t denominator) {
+__attribute__((used)) uint32_t __aeabi_uidiv(uint32_t numerator, uint32_t denominator) {
     return __aeabi_uidivmod(numerator, denominator);
 }
